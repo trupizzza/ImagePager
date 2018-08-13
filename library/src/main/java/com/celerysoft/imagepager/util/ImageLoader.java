@@ -13,7 +13,9 @@ import android.os.StatFs;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.util.LruCache;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 import com.celerysoft.imagepager.R;
 
@@ -145,7 +147,6 @@ public class ImageLoader {
             ImageView imageView = result.imageView;
             switch (msg.what) {
                 case MESSAGE_START:
-                    imageView.setImageResource(R.mipmap.loading);
                     break;
                 case MESSAGE_LOADED:
                     imageView.setImageBitmap(result.bitmap);
