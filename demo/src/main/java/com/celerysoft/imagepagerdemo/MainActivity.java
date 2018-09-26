@@ -8,7 +8,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 
+import com.celerysoft.imagepager.ImageLoadingListener;
 import com.celerysoft.imagepager.ImagePager;
 import com.celerysoft.imagepager.adapter.SimpleImagePagerAdapter;
 import com.celerysoft.imagepager.animation.DepthPageTransformer;
@@ -26,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
 
     private AppBarLayout mAppBarLayout;
     private Toolbar mToolbar;
+    private ProgressBar pb;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
         mAppBarLayout = (AppBarLayout) findViewById(R.id.app_bar_layout);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         mImagePager = (ImagePager) findViewById(R.id.main_image_pager);
+        pb = findViewById(R.id.pb);
     }
 
     private void bindListener() {
@@ -144,7 +148,15 @@ public class MainActivity extends AppCompatActivity {
         //mImagePager.setPageTransformer(true, new ZoomOutPageTransformer());
 
         mAdapter = new SimpleImagePagerAdapter(this);
+        mAdapter.setImageLoadingListener(new ImageLoadingListener() {
+            @Override public void onImageLoadingStart() {
+                pb.setVisibility(View.VISIBLE);
+            }
 
+            @Override public void onImageLoadingDone() {
+                pb.setVisibility(View.GONE);
+            }
+        });
         // set a ScaleType for the ImageView in ImagePager
 //        mAdapter.setScaleType(ImageView.ScaleType.FIT_CENTER);
         mAdapter.setScaleType(null);
@@ -164,19 +176,23 @@ public class MainActivity extends AppCompatActivity {
         images.add(image3);
 
         SimpleImagePagerAdapter.Image image4 = new SimpleImagePagerAdapter.Image();
-        image4.setImageUrl("http://7xpapo.com1.z0.glb.clouddn.com/blog/assets/postImages/2016102601.png");
+        image4.setImageUrl(
+                "https://upload.wikimedia.org/wikipedia/commons/d/d7/Nepal_-_Sagamartha_Trek_-_073_-_Apline_Landscape_and_3rd_Gokyo_Lake_%284434698287%29.jpg");
         images.add(image4);
 
         SimpleImagePagerAdapter.Image image5 = new SimpleImagePagerAdapter.Image();
-        image5.setImageUrl("http://7xpapo.com1.z0.glb.clouddn.com/blog/assets/postImages/2016011509.png");
+        image5.setImageUrl(
+                "http://7xpapo.com1.z0.glb.clouddn.com/blog/assets/postImages/2016011509.png");
         images.add(image5);
 
         SimpleImagePagerAdapter.Image image6 = new SimpleImagePagerAdapter.Image();
-        image6.setImageUrl("http://7xpapo.com1.z0.glb.clouddn.com/blog/assets/postImages/2016010502.png");
+        image6.setImageUrl(
+                "http://7xpapo.com1.z0.glb.clouddn.com/blog/assets/postImages/2016010502.png");
         images.add(image6);
 
         SimpleImagePagerAdapter.Image image7 = new SimpleImagePagerAdapter.Image();
-        image7.setImageUrl("http://7xpapo.com1.z0.glb.clouddn.com/blog/assets/postImages/2016010401.png");
+        image7.setImageUrl(
+                "http://7xpapo.com1.z0.glb.clouddn.com/blog/assets/postImages/2016010401.png");
         images.add(image7);
 
         // set your own local image paths

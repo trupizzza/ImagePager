@@ -4,11 +4,11 @@ import android.content.Context;
 import android.util.Log;
 import android.widget.ImageView;
 
+import com.celerysoft.imagepager.ImageLoadingListener;
 import com.celerysoft.imagepager.util.ImageLoader;
+import com.github.chrisbanes.photoview.PhotoView;
 
 import java.util.ArrayList;
-
-import uk.co.senab.photoview.PhotoView;
 
 /**
  * Simple image pager adapter
@@ -22,34 +22,8 @@ public class SimpleImagePagerAdapter extends ImagePagerAdapter {
     private ImageLoader mImageLoader;
 
     private ImageView.ScaleType mScaleType;
-
-    public ImageView.ScaleType getScaleType() {
-        return mScaleType;
-    }
-
-    /**
-     * <p> Set a ScaleType for the ImageView in ImagePager.
-     * <p> Please note that call this method before {@link com.celerysoft.imagepager.ImagePager#setAdapter(ImagePagerAdapter)}
-    * @param scaleType
-    */
-    public void setScaleType(ImageView.ScaleType scaleType) {
-        mScaleType = scaleType;
-    }
-
+    private ImageLoadingListener imageLoadingListener;
     private ArrayList<Image> mImages;
-    public ArrayList<Image> getImages() {
-        return mImages;
-    }
-    public void setImages(ArrayList<Image> images) {
-        mImages = images;
-    }
-    public void addImage(Image image) {
-        mImages.add(image);
-    }
-    public void addImage(int index, Image image) {
-        mImages.add(index, image);
-    }
-
 
     public SimpleImagePagerAdapter(Context context) {
         mContext = context;
@@ -58,8 +32,41 @@ public class SimpleImagePagerAdapter extends ImagePagerAdapter {
 
     public SimpleImagePagerAdapter(Context context, ImageView.ScaleType scaleType) {
         this(context);
-
         mScaleType = scaleType;
+    }
+
+    public ImageView.ScaleType getScaleType() {
+        return mScaleType;
+    }
+
+    /**
+     * <p> Set a ScaleType for the ImageView in ImagePager.
+     * <p> Please note that call this method before {@link com.celerysoft.imagepager.ImagePager#setAdapter(ImagePagerAdapter)}
+     *
+     * @param scaleType
+     */
+    public void setScaleType(ImageView.ScaleType scaleType) {
+        mScaleType = scaleType;
+    }
+
+    public ArrayList<Image> getImages() {
+        return mImages;
+    }
+
+    public void setImages(ArrayList<Image> images) {
+        mImages = images;
+    }
+
+    public void addImage(Image image) {
+        mImages.add(image);
+    }
+
+    public void addImage(int index, Image image) {
+        mImages.add(index, image);
+    }
+
+    public void setImageLoadingListener(ImageLoadingListener loadingListener) {
+        mImageLoader.setImageLoadingListener(loadingListener);
     }
 
     @Override
@@ -113,11 +120,11 @@ public class SimpleImagePagerAdapter extends ImagePagerAdapter {
     }
 
     public static class Image {
-        public Image() {}
-
         int mImageResId = -1;
         String mImagePath = null;
         String mImageUrl = null;
+        public Image() {
+        }
 
         public void setImageResId(int imageResId) {
             mImageResId = imageResId;
@@ -138,7 +145,7 @@ public class SimpleImagePagerAdapter extends ImagePagerAdapter {
         }
 
         public String getUrl() {
-            if(mImageResId != -1) {
+            if (mImageResId != -1) {
                 return Integer.toString(mImageResId);
             }
             if (mImagePath != null) {
