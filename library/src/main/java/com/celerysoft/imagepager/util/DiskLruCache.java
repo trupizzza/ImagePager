@@ -15,6 +15,8 @@
  */
 package com.celerysoft.imagepager.util;
 
+import android.support.annotation.NonNull;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
 import java.io.Closeable;
@@ -95,7 +97,7 @@ import java.util.concurrent.TimeUnit;
  * an error occurs while writing a cache value, the edit will fail silently.
  * Callers should handle other problems by catching {@code IOException} and
  * responding appropriately.
- *
+ * <p>
  * TODO: use Jake Wharton lib instead
  */
 public final class DiskLruCache implements Closeable {
@@ -159,12 +161,12 @@ public final class DiskLruCache implements Closeable {
     private final long maxSize;
     private final int valueCount;
     private final LinkedHashMap<String, Entry> lruEntries
-            = new LinkedHashMap<String, Entry>(0, 0.75f, true);
+            = new LinkedHashMap<>(0, 0.75f, true);
     /**
      * This cache uses a single background thread to evict entries.
      */
     private final ExecutorService executorService = new ThreadPoolExecutor(0, 1,
-            60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+            60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
     private long size = 0;
     private Writer journalWriter;
     private int redundantOpCount;
@@ -690,7 +692,7 @@ public final class DiskLruCache implements Closeable {
         if (journalWriter == null) {
             return; // already closed
         }
-        for (Entry entry : new ArrayList<Entry>(lruEntries.values())) {
+        for (Entry entry : new ArrayList<>(lruEntries.values())) {
             if (entry.currentEditor != null) {
                 entry.currentEditor.abort();
             }
@@ -868,7 +870,7 @@ public final class DiskLruCache implements Closeable {
                 }
             }
 
-            @Override public void write(byte[] buffer, int offset, int length) {
+            @Override public void write(@NonNull byte[] buffer, int offset, int length) {
                 try {
                     out.write(buffer, offset, length);
                 } catch (IOException e) {
@@ -922,7 +924,7 @@ public final class DiskLruCache implements Closeable {
             this.lengths = new long[valueCount];
         }
 
-        public String getLengths() throws IOException {
+        public String getLengths() {
             StringBuilder result = new StringBuilder();
             for (long size : lengths) {
                 result.append(' ').append(size);

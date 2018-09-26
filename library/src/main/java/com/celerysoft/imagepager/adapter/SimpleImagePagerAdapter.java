@@ -69,8 +69,7 @@ public class SimpleImagePagerAdapter extends ImagePagerAdapter {
         mImageLoader.setImageLoadingListener(loadingListener);
     }
 
-    @Override
-    public PhotoView getItem(int position) {
+    @Override public PhotoView getItem(int position) {
         PhotoView photoView = null;
 
         if (mImages != null && mImages.size() > position) {
@@ -86,16 +85,14 @@ public class SimpleImagePagerAdapter extends ImagePagerAdapter {
         return photoView;
     }
 
-    @Override
-    public int getCount() {
+    @Override public int getCount() {
         if (mImages != null) {
             return mImages.size();
         }
         return 0;
     }
 
-    @Override
-    public boolean removeImage(int imagePosition) {
+    @Override public boolean removeImage(int imagePosition) {
         boolean succeeded = true;
         try {
             if (mImages != null) {

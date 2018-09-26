@@ -68,7 +68,7 @@ public class ImageLoader {
             MAXIMUM_POOL_SIZE,
             KEEP_ALIVE,
             TimeUnit.SECONDS,
-            new LinkedBlockingQueue<Runnable>(),
+            new LinkedBlockingQueue<>(),
             sThreadFactory);
     private final int MESSAGE_START = 0;
     private final int MESSAGE_LOADED = 1;
@@ -150,16 +150,14 @@ public class ImageLoader {
             return;
         }
 
-        Runnable loadBitmapTask = new Runnable() {
-            @Override public void run() {
-                LoaderResult result = new LoaderResult(photoView, null, null);
-                mUiThreadHandler.obtainMessage(MESSAGE_START, result).sendToTarget();
+        Runnable loadBitmapTask = () -> {
+            LoaderResult result = new LoaderResult(photoView, null, null);
+            mUiThreadHandler.obtainMessage(MESSAGE_START, result).sendToTarget();
 
-                Bitmap bitmap = loadBitmap(uri, reqWidth, reqHeight);
-                if (bitmap != null) {
-                    result = new LoaderResult(photoView, uri, bitmap);
-                    mUiThreadHandler.obtainMessage(MESSAGE_LOADED, result).sendToTarget();
-                }
+            Bitmap bitmap1 = loadBitmap(uri, reqWidth, reqHeight);
+            if (bitmap1 != null) {
+                result = new LoaderResult(photoView, uri, bitmap1);
+                mUiThreadHandler.obtainMessage(MESSAGE_LOADED, result).sendToTarget();
             }
         };
         THREAD_POOL_EXECUTOR.execute(loadBitmapTask);

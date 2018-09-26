@@ -5,17 +5,13 @@ import android.support.annotation.NonNull;
 import android.support.v4.view.PagerAdapter;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import com.celerysoft.imagepager.BuildConfig;
 import com.celerysoft.imagepager.ImagePager;
 import com.celerysoft.imagepager.view.indicator.Indicator;
-import com.github.chrisbanes.photoview.OnPhotoTapListener;
-import com.github.chrisbanes.photoview.OnViewTapListener;
 import com.github.chrisbanes.photoview.PhotoView;
 
 import java.util.ArrayList;
-
 
 /**
  * Base adapter of ImagePager
@@ -93,18 +89,10 @@ public abstract class ImagePagerAdapter extends PagerAdapter {
         imageView.setVisibility(View.VISIBLE);
         mImageViews.set(position, imageView);
         if (mOnPageClickListener != null) {
-            imageView.setOnViewTapListener(new OnViewTapListener() {
-                @Override public void onViewTap(View view, float x, float y) {
-                    mOnPageClickListener.onPageClick();
-                }
-            });
+            imageView.setOnViewTapListener((view, x, y) -> mOnPageClickListener.onPageClick());
         }
         if (mOnPhotoTapListener != null) {
-            imageView.setOnPhotoTapListener(new OnPhotoTapListener() {
-                @Override public void onPhotoTap(ImageView view, float x, float y) {
-                    mOnPhotoTapListener.onImageClick();
-                }
-            });
+            imageView.setOnPhotoTapListener((view, x, y) -> mOnPhotoTapListener.onImageClick());
         }
 
         container.addView(imageView,
