@@ -16,6 +16,7 @@ import android.widget.ImageView;
 
 import com.celerysoft.imagepager.ImageLoadingListener;
 import com.github.chrisbanes.photoview.PhotoView;
+import com.jakewharton.disklrucache.DiskLruCache;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
