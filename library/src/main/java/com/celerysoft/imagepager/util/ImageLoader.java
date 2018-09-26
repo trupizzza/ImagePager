@@ -9,15 +9,13 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.os.StatFs;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.util.LruCache;
-import android.view.View;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
 
-import com.celerysoft.imagepager.R;
+import com.celerysoft.imagepager.ImageLoadingListener;
+import com.github.chrisbanes.photoview.PhotoView;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -38,7 +36,6 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import uk.co.senab.photoview.PhotoView;
 
 /**
  * Created by Celery on 16/3/31.
@@ -62,26 +59,53 @@ public class ImageLoader {
     private static final ThreadFactory sThreadFactory = new ThreadFactory() {
         private final AtomicInteger mCount = new AtomicInteger(1);
 
-        @Override
-        public Thread newThread(@NonNull Runnable r) {
+        @Override public Thread newThread(@NonNull Runnable r) {
             return new Thread(r, "ImageLoader#" + mCount.getAndIncrement());
         }
     };
 
-    public static final Executor THREAD_POOL_EXECUTOR = new ThreadPoolExecutor(CORE_POOL_SIZE, MAXIMUM_POOL_SIZE,
-            KEEP_ALIVE, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>(), sThreadFactory);
-
+    public static final Executor THREAD_POOL_EXECUTOR = new ThreadPoolExecutor(CORE_POOL_SIZE,
+            MAXIMUM_POOL_SIZE,
+            KEEP_ALIVE,
+            TimeUnit.SECONDS,
+            new LinkedBlockingQueue<Runnable>(),
+            sThreadFactory);
+    private final int MESSAGE_START = 0;
+    private final int MESSAGE_LOADED = 1;
     private Context mContext;
     private LruCache<String, Bitmap> mMemoryCache;
     private DiskLruCache mDiskLruCache;
+    private ImageLoadingListener imageLoadingListener;
+    private Handler mUiThreadHandler = new Handler(Looper.getMainLooper()) {
+        @Override public void handleMessage(Message msg) {
+            LoaderResult result = (LoaderResult) msg.obj;
+            ImageView imageView = result.imageView;
+            switch (msg.what) {
+                case MESSAGE_START:
+                    imageLoadingListener.onImageLoadingStart();
+                    break;
+                case MESSAGE_LOADED:
+                    imageLoadingListener.onImageLoadingDone();
+                    imageView.setImageBitmap(result.bitmap);
+                    String uri = (String) imageView.getTag();
+                    if (uri.equals(result.uri)) {
+                        imageView.setImageBitmap(result.bitmap);
+                    } else {
+                        Log.w(TAG, "set image bitmap, but url has changed, ignored!");
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+    };
 
     private ImageLoader(Context context) {
-        mContext = context.getApplicationContext();
+        mContext = context;
         int maxMemory = (int) (Runtime.getRuntime().maxMemory() / 1024);
         int cacheSize = maxMemory / 8;
         mMemoryCache = new LruCache<String, Bitmap>(cacheSize) {
-            @Override
-            protected int sizeOf(String key, Bitmap value) {
+            @Override protected int sizeOf(String key, Bitmap value) {
                 return value.getRowBytes() * value.getHeight() / 1024;
             }
         };
@@ -92,7 +116,10 @@ public class ImageLoader {
         }
         if (getUsableSpace(diskCacheDir) > DISK_CACHE_SIZE) {
             try {
-                mDiskLruCache = DiskLruCache.open(diskCacheDir, 1, DISK_CACHE_VALUE_COUNT, DISK_CACHE_SIZE);
+                mDiskLruCache = DiskLruCache.open(diskCacheDir,
+                        1,
+                        DISK_CACHE_VALUE_COUNT,
+                        DISK_CACHE_SIZE);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -101,6 +128,7 @@ public class ImageLoader {
 
     /**
      * build a new instance of ImageLoader
+     *
      * @param context Context
      * @return a new instance of ImageLoader
      */
@@ -123,8 +151,7 @@ public class ImageLoader {
         }
 
         Runnable loadBitmapTask = new Runnable() {
-            @Override
-            public void run() {
+            @Override public void run() {
                 LoaderResult result = new LoaderResult(photoView, null, null);
                 mUiThreadHandler.obtainMessage(MESSAGE_START, result).sendToTarget();
 
@@ -138,38 +165,13 @@ public class ImageLoader {
         THREAD_POOL_EXECUTOR.execute(loadBitmapTask);
     }
 
-    private final int MESSAGE_START = 0;
-    private final int MESSAGE_LOADED = 1;
-    private Handler mUiThreadHandler = new Handler(Looper.getMainLooper()) {
-        @Override
-        public void handleMessage(Message msg) {
-            LoaderResult result = (LoaderResult) msg.obj;
-            ImageView imageView = result.imageView;
-            switch (msg.what) {
-                case MESSAGE_START:
-                    break;
-                case MESSAGE_LOADED:
-                    imageView.setImageBitmap(result.bitmap);
-                    String uri = (String) imageView.getTag();
-                    if (uri.equals(result.uri)) {
-                        imageView.setImageBitmap(result.bitmap);
-                    } else {
-                        Log.w(TAG, "set image bitmap, but url has changed, ignored!");
-                    }
-                    break;
-                default:
-                    break;
-            }
-        }
-    };
-
     private void addBitmapToMemoryCache(String key, Bitmap bitmap) {
         if (getBitmapFromMemoryCache(key) == null) {
             mMemoryCache.put(key, bitmap);
         }
     }
 
-    private Bitmap getBitmapFromMemoryCache (String key) {
+    private Bitmap getBitmapFromMemoryCache(String key) {
         return mMemoryCache.get(key);
     }
 
@@ -316,8 +318,7 @@ public class ImageLoader {
             in = new FileInputStream(urlString);
             out = new BufferedOutputStream(outputStream, IO_BUFFER_SIZE);
 
-            int bufferSize = IO_BUFFER_SIZE;
-            byte[] buffer = new byte[bufferSize];
+            byte[] buffer = new byte[IO_BUFFER_SIZE];
             int length;
             while ((length = in.read(buffer)) != -1) {
                 out.write(buffer, 0, length);
@@ -391,7 +392,8 @@ public class ImageLoader {
         String key = hashKeyFromUrl(url);
         DiskLruCache.Snapshot snapshot = mDiskLruCache.get(key);
         if (snapshot != null) {
-            FileInputStream fileInputStream = (FileInputStream) snapshot.getInputStream(DISK_CACHE_INDEX);
+            FileInputStream fileInputStream = (FileInputStream) snapshot.getInputStream(
+                    DISK_CACHE_INDEX);
             FileDescriptor fileDescriptor = fileInputStream.getFD();
             bitmap = ImageUtil.getBitmap(fileDescriptor, reqWidth, reqHeight);
             if (bitmap != null) {
@@ -452,8 +454,8 @@ public class ImageLoader {
     private String bytesToHexString(byte[] bytes) {
         StringBuilder stringBuilder = new StringBuilder();
 
-        for (int i = 0; i < bytes.length; ++i) {
-            String hex = Integer.toHexString(0xFF & bytes[i]);
+        for (byte aByte : bytes) {
+            String hex = Integer.toHexString(0xFF & aByte);
             if (hex.length() == 1) {
                 stringBuilder.append('0');
             }
@@ -464,7 +466,8 @@ public class ImageLoader {
     }
 
     public File getDiskCacheDir(Context context, String uniqueName) {
-        boolean isExternalStorageAvailable = Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED);
+        boolean isExternalStorageAvailable = Environment.getExternalStorageState()
+                .equals(Environment.MEDIA_MOUNTED);
 
         final String cachePath;
         if (isExternalStorageAvailable) {
@@ -478,11 +481,11 @@ public class ImageLoader {
 
     @TargetApi(Build.VERSION_CODES.GINGERBREAD)
     private long getUsableSpace(File path) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD) {
-            return  path.getUsableSpace();
-        }
-        final StatFs statFs = new StatFs((path.getPath()));
-        return statFs.getBlockSizeLong() * statFs.getAvailableBlocksLong();
+        return path.getUsableSpace();
+    }
+
+    public void setImageLoadingListener(ImageLoadingListener imageLoadingListener) {
+        this.imageLoadingListener = imageLoadingListener;
     }
 
     public static class LoaderResult {

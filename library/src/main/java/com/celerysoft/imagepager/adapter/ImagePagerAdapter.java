@@ -1,19 +1,21 @@
 package com.celerysoft.imagepager.adapter;
 
 import android.os.Parcelable;
+import android.support.annotation.NonNull;
 import android.support.v4.view.PagerAdapter;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 
 import com.celerysoft.imagepager.BuildConfig;
 import com.celerysoft.imagepager.ImagePager;
 import com.celerysoft.imagepager.view.indicator.Indicator;
+import com.github.chrisbanes.photoview.OnPhotoTapListener;
+import com.github.chrisbanes.photoview.OnViewTapListener;
+import com.github.chrisbanes.photoview.PhotoView;
 
 import java.util.ArrayList;
 
-import uk.co.senab.photoview.PhotoView;
-import uk.co.senab.photoview.PhotoViewAttacher;
 
 /**
  * Base adapter of ImagePager
@@ -35,6 +37,12 @@ public abstract class ImagePagerAdapter extends PagerAdapter {
      * mIndicator is assigned as the {@link Indicator} of the {@link ImagePager}.
      **/
     private Indicator mIndicator;
+    private ImagePager.OnImageClickListener mOnPhotoTapListener;
+    private ImagePager.OnPageClickListener mOnPageClickListener;
+
+    public ImagePagerAdapter() {
+        super();
+    }
 
     /**
      * don't call this method, use {@link ImagePager#setIndicator(Indicator)} to instead of.
@@ -43,43 +51,37 @@ public abstract class ImagePagerAdapter extends PagerAdapter {
         mIndicator = indicator;
     }
 
-    private ImagePager.OnImageClickListener mOnPhotoTapListener;
     public void setOnImageClickListener(ImagePager.OnImageClickListener onImageClickListener) {
         mOnPhotoTapListener = onImageClickListener;
     }
 
-    private ImagePager.OnPageClickListener mOnPageClickListener;
     public void setOnPageClickListenerListener(ImagePager.OnPageClickListener onPageClickListener) {
         mOnPageClickListener = onPageClickListener;
-    }
-
-    public ImagePagerAdapter() {
-        super();
     }
 
     public abstract PhotoView getItem(int position);
 
     /**
      * remove image from adapter
+     *
      * @param imagePosition position of image
      * @return true if remove successfully, false if index out of bound etc.
      */
     public abstract boolean removeImage(int imagePosition);
 
-    @Override
-    public abstract int getCount();
+    @Override public abstract int getCount();
 
-    @Override
-    public boolean isViewFromObject(View view, Object object) {
+    @Override public boolean isViewFromObject(@NonNull View view, @NonNull Object object) {
         return view == object;
     }
 
-    @Override
-    public Object instantiateItem(ViewGroup container, int position) {
+    @NonNull @Override public Object instantiateItem(@NonNull ViewGroup container, int position) {
         if (mImageViews.size() > position) {
             PhotoView v = mImageViews.get(position);
             if (v != null) {
-                container.addView(v, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+                container.addView(v,
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        ViewGroup.LayoutParams.MATCH_PARENT);
                 return v;
             }
         }
@@ -91,29 +93,28 @@ public abstract class ImagePagerAdapter extends PagerAdapter {
         imageView.setVisibility(View.VISIBLE);
         mImageViews.set(position, imageView);
         if (mOnPageClickListener != null) {
-            imageView.setOnViewTapListener(new PhotoViewAttacher.OnViewTapListener() {
-                @Override
-                public void onViewTap(View view, float x, float y) {
+            imageView.setOnViewTapListener(new OnViewTapListener() {
+                @Override public void onViewTap(View view, float x, float y) {
                     mOnPageClickListener.onPageClick();
                 }
             });
         }
         if (mOnPhotoTapListener != null) {
-            imageView.setOnPhotoTapListener(new PhotoViewAttacher.OnPhotoTapListener() {
-                @Override
-                public void onPhotoTap(View view, float x, float y) {
+            imageView.setOnPhotoTapListener(new OnPhotoTapListener() {
+                @Override public void onPhotoTap(ImageView view, float x, float y) {
                     mOnPhotoTapListener.onImageClick();
                 }
             });
         }
 
-        container.addView(imageView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        container.addView(imageView,
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT);
 
         return imageView;
     }
 
-    @Override
-    public void destroyItem(ViewGroup container, int position, Object object) {
+    @Override public void destroyItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
         PhotoView imageView = (PhotoView) object;
         if (imageView != null) {
             if (mImageViews.size() > 0) {
@@ -124,29 +125,12 @@ public abstract class ImagePagerAdapter extends PagerAdapter {
         container.removeView((View) object);
     }
 
-    @Override
-    public void setPrimaryItem(ViewGroup container, int position, Object object) {
+    @Override public void setPrimaryItem(@NonNull ViewGroup container, int position, @NonNull Object object) {
         super.setPrimaryItem(container, position, object);
-//        PhotoView imageView = (PhotoView) object;
-//        imageView.
-//
-//        if (imageView != mCurrentPrimaryItem) {
-//            if (mCurrentPrimaryItem != null) {
-//                mCurrentPrimaryItem.setVisibility(View.INVISIBLE);
-//            }
-//
-//            if (imageView != null) {
-//                imageView.setVisibility(View.VISIBLE);
-//            }
-//        }
-//
-//        mCurrentPrimaryItem = imageView;
     }
 
 
-
-    @Override
-    public int getItemPosition(Object object) {
+    @Override public int getItemPosition(@NonNull Object object) {
         PhotoView imageView = (PhotoView) object;
         int position = mImageViews.indexOf(imageView);
         if (position == -1) {
@@ -156,20 +140,17 @@ public abstract class ImagePagerAdapter extends PagerAdapter {
         }
     }
 
-    @Override
-    public Parcelable saveState() {
+    @Override public Parcelable saveState() {
         //TODO
         return super.saveState();
     }
 
-    @Override
-    public void restoreState(Parcelable state, ClassLoader loader) {
+    @Override public void restoreState(Parcelable state, ClassLoader loader) {
         //TODO
         super.restoreState(state, loader);
     }
 
-    @Override
-    public void notifyDataSetChanged() {
+    @Override public void notifyDataSetChanged() {
         if (mIsRemovedImage) {
             if (mIndicator != null) {
                 mIndicator.onPageDeleted();
