@@ -83,10 +83,10 @@ public class ImageLoader {
             ImageView imageView = result.imageView;
             switch (msg.what) {
                 case MESSAGE_START:
-                    imageLoadingListener.onImageLoadingStart();
+                    if (imageLoadingListener != null) imageLoadingListener.onImageLoadingStart();
                     break;
                 case MESSAGE_LOADED:
-                    imageLoadingListener.onImageLoadingDone();
+                    if (imageLoadingListener != null) imageLoadingListener.onImageLoadingDone();
                     imageView.setImageBitmap(result.bitmap);
                     String uri = (String) imageView.getTag();
                     if (uri.equals(result.uri)) {
