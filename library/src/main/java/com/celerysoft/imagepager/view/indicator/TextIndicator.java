@@ -2,6 +2,7 @@ package com.celerysoft.imagepager.view.indicator;
 
 import android.content.Context;
 import android.os.Build;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.Gravity;
 import android.widget.TextView;
@@ -21,11 +22,12 @@ public class TextIndicator extends TextView implements Indicator {
     private int mImageCount;
     private int mCurrentImagePosition = 0;
 
+    private String noImagesText;
+
     private float mTextSize = 16;
 
     public TextIndicator(Context context) {
         super(context);
-
         mContext = context;
 
         setGravity(Gravity.CENTER);
@@ -39,6 +41,10 @@ public class TextIndicator extends TextView implements Indicator {
             //noinspection deprecation
             setTextColor(context.getResources().getColor(R.color.text_indicator_text_color));
         }
+    }
+
+    public void setNoImagesText(String noImagesText) {
+        this.noImagesText = noImagesText;
     }
 
     @Override
@@ -63,7 +69,9 @@ public class TextIndicator extends TextView implements Indicator {
         if (mImageCount <= 0) {
 //            setTextSize(DensityUtil.sp2px(mContext, mTextSize * 1.25f));
             setTextSize(mTextSize * 1.25f);
-            text = mContext.getString(R.string.no_images);
+
+            text = TextUtils.isEmpty(noImagesText) ? mContext.getString(
+                    R.string.no_images) : noImagesText;
             if (mImageCount < 0) {
                 Log.e(TAG, "image count less than 0, it could not be happened!");
             }
@@ -71,7 +79,10 @@ public class TextIndicator extends TextView implements Indicator {
 //            setTextSize(DensityUtil.sp2px(mContext, mTextSize));
             setTextSize(mTextSize);
 //            text = (mCurrentImagePosition + 1) + "/" + mImageCount;
-            text = String.format(Locale.getDefault(), "%d/%d", mCurrentImagePosition + 1, mImageCount);
+            text = String.format(Locale.getDefault(),
+                    "%d/%d",
+                    mCurrentImagePosition + 1,
+                    mImageCount);
         }
         setText(text);
     }

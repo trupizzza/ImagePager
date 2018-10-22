@@ -1,6 +1,7 @@
 package com.celerysoft.imagepager.view.indicator;
 
 import android.content.Context;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -23,11 +24,17 @@ public class DotIndicator extends LinearLayout implements Indicator {
     private int mSelectedImageResourceId = R.drawable.ic_selected;
     private int mUnselectedImageResourceId = R.drawable.ic_unselected;
 
+    private String noImagesText;
+
     public DotIndicator(Context context) {
         super(context);
 
         setOrientation(HORIZONTAL);
         setBackgroundResource(R.drawable.indicator_background);
+    }
+
+    public void setNoImagesText(String noImagesText) {
+        this.noImagesText = noImagesText;
     }
 
     public void setSelectedImageResource(int resId) {
@@ -52,7 +59,7 @@ public class DotIndicator extends LinearLayout implements Indicator {
         if (mImageCount <= 0) {
             TextView textView = new TextView(getContext());
             textView.setTextSize(20);
-            String text = getContext().getString(R.string.no_images);
+            String text = TextUtils.isEmpty(noImagesText) ? getContext().getString(R.string.no_images) : noImagesText;
             textView.setText(text);
             addView(textView);
             if (mImageCount < 0) {
