@@ -120,6 +120,7 @@ public class SimpleImagePagerAdapter extends ImagePagerAdapter {
         int mImageResId = -1;
         String mImagePath = null;
         String mImageUrl = null;
+
         public Image() {
         }
 

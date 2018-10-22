@@ -6,7 +6,6 @@ import android.view.MotionEvent;
 
 /**
  * Created by Administrator on 2015-11-18.
- *
  */
 public class Pager extends ViewPager {
     @SuppressWarnings("unused")
@@ -16,8 +15,7 @@ public class Pager extends ViewPager {
         super(context);
     }
 
-    @Override
-    public boolean onInterceptTouchEvent(MotionEvent ev) {
+    @Override public boolean onInterceptTouchEvent(MotionEvent ev) {
         try {
             return super.onInterceptTouchEvent(ev);
         } catch (IllegalArgumentException e) {

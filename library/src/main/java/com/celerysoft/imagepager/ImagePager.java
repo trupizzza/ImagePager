@@ -12,15 +12,13 @@ import com.celerysoft.imagepager.adapter.ImagePagerAdapter;
 import com.celerysoft.imagepager.util.DensityUtil;
 import com.celerysoft.imagepager.view.Pager;
 import com.celerysoft.imagepager.view.indicator.Indicator;
-import com.celerysoft.imagepager.view.indicator.TextIndicator;
 
 /**
  * ImagePager, display images, contain a indicator and a pager.
  * Created by Celery on 2015-11-19.
  */
 public class ImagePager extends ViewGroup {
-    // const
-    private static final String TAG = "ImagePager";
+
     public static final int LEFT = 0x0;
     public static final int TOP = 0x1;
     public static final int RIGHT = 0x2;
@@ -29,7 +27,8 @@ public class ImagePager extends ViewGroup {
     public static final int TOP_RIGHT = 0x5;
     public static final int BOTTOM_LEFT = 0x6;
     public static final int BOTTOM_RIGHT = 0x7;
-
+    // const
+    private static final String TAG = "ImagePager";
     private static int CHILD_COUNT = 1;
 
     // field
@@ -40,9 +39,24 @@ public class ImagePager extends ViewGroup {
 
     // propertry
     private ImagePagerAdapter mAdapter;
+    private OnImageChangeListener mOnImageChangeListener;
+    private OnImageClickListener mOnImageClickListener;
+    private OnPageClickListener mOnPageClickListener;
+
+    public ImagePager(Context context) {
+        super(context);
+        initImagePager();
+    }
+
+    public ImagePager(Context context, AttributeSet attrs) {
+        super(context, attrs);
+        initImagePager();
+    }
+
     public ImagePagerAdapter getAdapter() {
         return mAdapter;
     }
+
     public void setAdapter(ImagePagerAdapter adapter) {
         mAdapter = adapter;
         ImagePagerAdapter imagePagerAdapter = (ImagePagerAdapter) adapter;
@@ -61,18 +75,18 @@ public class ImagePager extends ViewGroup {
         }
     }
 
-    private OnImageChangeListener mOnImageChangeListener;
     public OnImageChangeListener getOnImageChangeListener() {
         return mOnImageChangeListener;
     }
+
     public void setOnImageChangeListener(OnImageChangeListener onImageChangeListener) {
         mOnImageChangeListener = onImageChangeListener;
     }
 
-    private OnImageClickListener mOnImageClickListener;
     public OnImageClickListener getOnImageClickListener() {
         return mOnImageClickListener;
     }
+
     public void setOnImageClickListener(OnImageClickListener onImageClickListener) {
         mOnImageClickListener = onImageClickListener;
         if (mAdapter != null) {
@@ -80,25 +94,15 @@ public class ImagePager extends ViewGroup {
         }
     }
 
-    private OnPageClickListener mOnPageClickListener;
     public OnPageClickListener getOnPageClickListener() {
         return mOnPageClickListener;
     }
+
     public void setOnPageClickListener(OnPageClickListener onPageClickListener) {
         mOnPageClickListener = onPageClickListener;
         if (mAdapter != null) {
             mAdapter.setOnPageClickListenerListener(onPageClickListener);
         }
-    }
-
-    public ImagePager(Context context) {
-        super(context);
-        initImagePager();
-    }
-
-    public ImagePager(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        initImagePager();
     }
 
     private void initImagePager() {
@@ -115,7 +119,9 @@ public class ImagePager extends ViewGroup {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
                 if (mOnImageChangeListener != null) {
-                    mOnImageChangeListener.onPageScrolled(position, positionOffset, positionOffsetPixels);
+                    mOnImageChangeListener.onPageScrolled(position,
+                            positionOffset,
+                            positionOffsetPixels);
                 }
             }
 
@@ -294,11 +300,13 @@ public class ImagePager extends ViewGroup {
             mIndicator.onPageSelected(getCurrentImagePosition());
             mAdapter.setIndicator(mIndicator);
         }
-        addView((View) mIndicator, new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+        addView((View) mIndicator,
+                new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
     }
 
     /**
      * set up the margin of indicator, default is 16 dp.
+     *
      * @param marginInDp margin in dp value.
      */
     public void setIndicatorMargin(float marginInDp) {
@@ -307,8 +315,9 @@ public class ImagePager extends ViewGroup {
 
     /**
      * set up the position of indicator
+     *
      * @param position pick one from {@link #LEFT}, {@link #TOP}, {@link #RIGHT}, {@link #BOTTOM},
-     * {@link #TOP_LEFT}, {@link #TOP_RIGHT}, {@link #BOTTOM_LEFT}, {@link #BOTTOM_RIGHT}
+     *                 {@link #TOP_LEFT}, {@link #TOP_RIGHT}, {@link #BOTTOM_LEFT}, {@link #BOTTOM_RIGHT}
      */
     public void setIndicatorPosition(int position) {
         mIndicatorPosition = position;
@@ -333,7 +342,9 @@ public class ImagePager extends ViewGroup {
 
     public interface OnImageChangeListener {
         void onPageScrolled(int position, float positionOffset, int positionOffsetPixels);
+
         void onPageSelected(int position);
+
         void onPageScrollStateChanged(int state);
     }
 

@@ -19,6 +19,7 @@ public class ImageUtil {
 
     /**
      * get bitmap by file absolute path
+     *
      * @param filePath file absolute path
      * @return bitmap
      */
@@ -31,7 +32,8 @@ public class ImageUtil {
 
     /**
      * get bitmap by file absolute path
-     * @param filePath file absolute path
+     *
+     * @param filePath     file absolute path
      * @param targetWidth
      * @param targetHeight
      * @return bitmap
@@ -52,7 +54,10 @@ public class ImageUtil {
             int photoWidth = options.outWidth;
             int photoHeight = options.outHeight;
 
-            options.inSampleSize = calculateInSampleSize(photoWidth, photoHeight, targetWidth, targetHeight);
+            options.inSampleSize = calculateInSampleSize(photoWidth,
+                    photoHeight,
+                    targetWidth,
+                    targetHeight);
             options.inJustDecodeBounds = false;
             bitmap = BitmapFactory.decodeFile(filePath, options);
         } catch (OutOfMemoryError error) {
@@ -64,6 +69,7 @@ public class ImageUtil {
 
     /**
      * get bitmap by file absolute path
+     *
      * @param resId resource id
      * @return bitmap
      */
@@ -76,6 +82,7 @@ public class ImageUtil {
 
     /**
      * get bitmap by file absolute path
+     *
      * @param resId resource id
      * @return bitmap
      */
@@ -90,7 +97,10 @@ public class ImageUtil {
             int photoWidth = options.outWidth;
             int photoHeight = options.outHeight;
 
-            options.inSampleSize = calculateInSampleSize(photoWidth, photoHeight, targetWidth, targetHeight);
+            options.inSampleSize = calculateInSampleSize(photoWidth,
+                    photoHeight,
+                    targetWidth,
+                    targetHeight);
             options.inJustDecodeBounds = false;
             bitmap = BitmapFactory.decodeResource(resources, resId, options);
         } catch (OutOfMemoryError error) {
@@ -118,7 +128,10 @@ public class ImageUtil {
             int photoWidth = options.outWidth;
             int photoHeight = options.outHeight;
 
-            options.inSampleSize = calculateInSampleSize(photoWidth, photoHeight, targetWidth, targetHeight);
+            options.inSampleSize = calculateInSampleSize(photoWidth,
+                    photoHeight,
+                    targetWidth,
+                    targetHeight);
             options.inJustDecodeBounds = false;
             bitmap = BitmapFactory.decodeFileDescriptor(fileDescriptor, null, options);
         } catch (OutOfMemoryError error) {
@@ -129,13 +142,13 @@ public class ImageUtil {
     }
 
 
-
     /**
      * calculate the scaling of bitmap
-     * @param originalWidth bitmap original width
+     *
+     * @param originalWidth  bitmap original width
      * @param originalHeight bitmap original height
-     * @param targetWidth target width
-     * @param targetHeight target height
+     * @param targetWidth    target width
+     * @param targetHeight   target height
      * @return scaling of bitmap
      */
     private static int calculateInSampleSize(int originalWidth, int originalHeight, int targetWidth, int targetHeight) {

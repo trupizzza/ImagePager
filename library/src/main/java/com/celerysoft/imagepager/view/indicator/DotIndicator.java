@@ -14,7 +14,6 @@ import com.celerysoft.imagepager.util.DensityUtil;
  * Created by admin on 16/12/21.
  * Indicator with dots.
  */
-
 public class DotIndicator extends LinearLayout implements Indicator {
     private static final String TAG = "DotIndicator";
 
@@ -45,19 +44,18 @@ public class DotIndicator extends LinearLayout implements Indicator {
         mUnselectedImageResourceId = resId;
     }
 
-    @Override
-    public void onPageSelected(int position) {
+    @Override public void onPageSelected(int position) {
         mCurrentImagePosition = position;
         updateUi(position);
     }
 
-    @Override
-    public void onPageDeleted() {
+    @Override public void onPageDeleted() {
         removeViewAt(mImageCount - 1);
         mImageCount -= 1;
         mCurrentImagePosition = mCurrentImagePosition < mImageCount ? mCurrentImagePosition : mImageCount - 1;
         if (mImageCount <= 0) {
             TextView textView = new TextView(getContext());
+            // TODO: remove hardcoded value(for default - ok, otherwise must be set by setter\builder method
             textView.setTextSize(20);
             String text = TextUtils.isEmpty(noImagesText) ? getContext().getString(R.string.no_images) : noImagesText;
             textView.setText(text);
@@ -70,8 +68,7 @@ public class DotIndicator extends LinearLayout implements Indicator {
         }
     }
 
-    @Override
-    public void onPageAdapterChanged(int imageCount) {
+    @Override public void onPageAdapterChanged(int imageCount) {
         mImageCount = imageCount;
         mCurrentImagePosition = 0;
 
@@ -88,8 +85,6 @@ public class DotIndicator extends LinearLayout implements Indicator {
             view.getLayoutParams().height = DensityUtil.dp2px(getContext(), 12);
             view.requestLayout();
         }
-
-//        updateUi(0);
     }
 
     private void updateUi(int selectedImagePosition) {
