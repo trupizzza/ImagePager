@@ -23,6 +23,7 @@ public class SimpleImagePagerAdapter extends ImagePagerAdapter {
 
     private ImageView.ScaleType mScaleType;
     private ImageLoadingListener imageLoadingListener;
+    // TODO: use List interface instead of concrete implementation
     private ArrayList<Image> mImages;
 
     public SimpleImagePagerAdapter(Context context) {
@@ -49,10 +50,12 @@ public class SimpleImagePagerAdapter extends ImagePagerAdapter {
         mScaleType = scaleType;
     }
 
+    // TODO: return List interface instead of concrete implementation
     public ArrayList<Image> getImages() {
         return mImages;
     }
 
+    // TODO: pass List interface instead of concrete implementation
     public void setImages(ArrayList<Image> images) {
         mImages = images;
     }

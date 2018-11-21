@@ -25,6 +25,7 @@ public abstract class ImagePagerAdapter extends PagerAdapter {
     private final boolean DEBUG = BuildConfig.DEBUG;
 
     protected boolean mIsRemovedImage = false;
+    // TODO: use List interface instead of concrete implementation
     private ArrayList<PhotoView> mImageViews = new ArrayList<>();
     private PhotoView mCurrentPrimaryItem = null;
 
