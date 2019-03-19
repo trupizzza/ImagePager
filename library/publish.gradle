@@ -1,9 +1,6 @@
 apply plugin: 'maven-publish'
 apply plugin: 'com.jfrog.bintray'
 
-//version '1.0.0'
-//group 'com.bintray'
-
 group = PROJ_GROUP
 version = PROJ_VERSION
 project.archivesBaseName = PROJ_ARTIFACTID
